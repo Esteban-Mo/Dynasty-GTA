@@ -32,10 +32,6 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
     const isAdmin = searchParams.get('r') === 'nGsxvM4ABSbBg965e020rKwyWjG2n8nUJtBeTh9lxLrw0hAgx3';
 
     useEffect(() => {
-        void fetchZones();
-    }, []);
-
-    useEffect(() => {
         if (currentLayer && featureGroupRef.current) {
             (currentLayer as L.Path).setStyle({ color: zoneColor });
         }
@@ -56,6 +52,10 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
             console.error("Erreur lors de la récupération des zones:", error);
         }
     };
+
+    useEffect(() => {
+        void fetchZones();
+    }, [fetchZones]);
 
     const handleCreated = (e: LeafletEvent) => {
         const layer = e.layer as L.Polygon;
