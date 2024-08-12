@@ -39,8 +39,9 @@ const NavMenu = () => {
 
                 <Tooltip title={text.global_menu.interior} placement={"left"} arrow>
                     <IconButton
-                        sx={{color: pathname === '/interior' ? color : 'white'}}
-                        onClick={() => handleNavigation('/interior')}>
+                        sx={{color: pathname === '/galery' ? color : 'white'}}
+                        onClick={() => handleNavigation('/galery?type=1')}>
+                        {/* eslint-disable-next-line jsx-a11y/alt-text */}
                         <Image fontSize={'medium'}/>
                     </IconButton>
                 </Tooltip>

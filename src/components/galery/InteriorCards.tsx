@@ -6,7 +6,7 @@ import CircularLoader from '@/components/loaders/CircularLoader';
 
 export const InteriorCards: React.FC = () => {
     const [interiors, setInteriors] = useState<ExtendedInterior[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [_, setLoading] = useState<boolean>(true);
     const [showLoader, setShowLoader] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const searchParams = useSearchParams();
@@ -20,7 +20,9 @@ export const InteriorCards: React.FC = () => {
                 const typeIdParam = searchParams.get('type');
                 const typeId = typeIdParam ? parseInt(typeIdParam, 10) : undefined;
                 const fetchedInteriors = await getAllInteriors(typeId);
-                setInteriors(fetchedInteriors);
+                // Filter out interiors where displayed is false
+                const displayedInteriors = fetchedInteriors.filter(interior => interior.displayed);
+                setInteriors(displayedInteriors);
             } catch (err) {
                 console.error('Error fetching interiors:', err);
                 setError('Failed to load interiors. Please try again later.');
@@ -33,7 +35,7 @@ export const InteriorCards: React.FC = () => {
             }
         };
 
-        fetchInteriors();
+        void fetchInteriors();
     }, [searchParams]);
 
     if (showLoader) {

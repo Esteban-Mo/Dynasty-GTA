@@ -125,7 +125,7 @@ export const InteriorCard: React.FC<{ data: ExtendedInterior }> = ({ data }) => 
                         }}>{data.title}</div>
 
                         <div className="flex flex-row justify-center items-center m-5 gap-5 font-bold">
-                            {data.type.name === 'GARAGE' && shouldRenderChip(data.parkingSpots) && (
+                            {shouldRenderChip(data.parkingSpots) && (
                                 <ParkingChip spots={data.parkingSpots!} />
                             )}
 

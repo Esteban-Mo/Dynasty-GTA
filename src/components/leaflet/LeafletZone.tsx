@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FeatureGroup, Polygon, Tooltip } from 'react-leaflet';
+import { FeatureGroup, Polygon, Tooltip, useMap } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
-import { LatLng, LeafletEvent, Layer, PathOptions } from 'leaflet';
+import { LatLng, LeafletEvent, PathOptions, LatLngBounds } from 'leaflet';
 import { createZone, ExtendedZone, getAllZones, ZoneInput } from '@/actions/db/zone.action';
 import { useSearchParams } from 'next/navigation';
+import { Switch, FormControlLabel } from '@mui/material';
 
 interface Zone {
     id: number;
@@ -21,9 +22,12 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
     const [currentZone, setCurrentZone] = useState<Zone | null>(null);
     const [zoneName, setZoneName] = useState<string>('');
     const [zoneColor, setZoneColor] = useState<string>('#3388ff');
+    const [highlightedZoneId, setHighlightedZoneId] = useState<number | null>(null);
+    const [showNames, setShowNames] = useState<boolean>(false);
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
     const [currentLayer, setCurrentLayer] = useState<L.Layer | null>(null);
     const searchParams = useSearchParams();
+    const map = useMap();
 
     const isAdmin = searchParams.get('r') === 'nGsxvM4ABSbBg965e020rKwyWjG2n8nUJtBeTh9lxLrw0hAgx3';
 
@@ -122,6 +126,16 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
         }
     };
 
+    const handleZoomToZone = (zone: Zone) => {
+        // @ts-ignore
+        const bounds = new LatLngBounds(zone.coordinates);
+        map.fitBounds(bounds, { padding: [50, 50] });
+    };
+
+    const handleToggleNames = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowNames(event.target.checked);
+    };
+
     return (
         <>
             {isAdmin && (
@@ -149,11 +163,17 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
                 <Polygon
                     key={zone.id}
                     positions={zone.coordinates}
-                    pathOptions={{ color: zone.color } as PathOptions}
+                    pathOptions={{
+                        color: zone.color,
+                        fillOpacity: highlightedZoneId === zone.id ? 0.8 : 0.6,
+                        weight: highlightedZoneId === zone.id ? 3 : 2
+                    } as PathOptions}
                 >
-                    <Tooltip permanent direction="center" className="custom-tooltip">
-                        {zone.name}
-                    </Tooltip>
+                    {showNames && (
+                        <Tooltip permanent direction="center" className="custom-tooltip">
+                            <span style={{ color: 'black', textShadow: 'none', fontSize: '10px', fontWeight: 'bold' }}>{zone.name}</span>
+                        </Tooltip>
+                    )}
                 </Polygon>
             ))}
             {isAdmin && (
@@ -213,6 +233,54 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
                     </button>
                 </div>
             )}
+            <div style={{
+                position: 'absolute',
+                bottom: '20px',
+                left: '20px',
+                backgroundColor: '#333333',
+                padding: '10px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                zIndex: 1000
+            }}>
+                <h3 style={{ marginBottom: '10px', fontWeight: 'bold', color: 'white' }}>Légende</h3>
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={showNames}
+                            onChange={handleToggleNames}
+                            name="showNames"
+                            color="primary"
+                        />
+                    }
+                    label="Afficher les noms"
+                    style={{ color: 'white', marginBottom: '10px' }}
+                />
+                {zones.map((zone) => (
+                    <div
+                        key={zone.id}
+                        onMouseEnter={() => setHighlightedZoneId(zone.id)}
+                        onMouseLeave={() => setHighlightedZoneId(null)}
+                        onClick={() => handleZoomToZone(zone)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '5px',
+                            cursor: 'pointer',
+                            color: 'white'
+                        }}
+                    >
+                        <div style={{
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: zone.color,
+                            marginRight: '10px',
+                            border: '1px solid white'
+                        }}></div>
+                        <span>{zone.name}</span>
+                    </div>
+                ))}
+            </div>
         </>
     );
 };
