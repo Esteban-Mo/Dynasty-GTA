@@ -55,7 +55,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
 
     useEffect(() => {
         void fetchZones();
-    }, [fetchZones]);
+    }, []);
 
     const handleCreated = (e: LeafletEvent) => {
         const layer = e.layer as L.Polygon;
@@ -235,7 +235,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange }) => {
             )}
             <div style={{
                 position: 'absolute',
-                bottom: '20px',
+                bottom: '80px',
                 left: '20px',
                 backgroundColor: '#333333',
                 padding: '10px',

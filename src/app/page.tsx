@@ -1,8 +1,25 @@
+"use client"
+
 import {BackgroundBeams} from '@/components/ui/background-beams';
 import {Logo} from '@/components/logo/Logo';
 import {AnimatedTooltip} from '@/components/ui/animated-tooltip';
+import FAQModal from "@/components/faq/FAQModal";
 
 export default function Home() {
+
+
+    const faqItems = [
+        {
+            question: "Qu'est-ce que Dynasty ?",
+            answer: "Dynasty est une plateforme de gestion immobilière innovante..."
+        },
+        {
+            question: "Comment puis-je m'inscrire ?",
+            answer: "Vous pouvez vous inscrire en cliquant sur le bouton 'S'inscrire' en haut à droite de la page d'accueil..."
+        },
+        // Ajoutez d'autres questions/réponses ici
+    ];
+
     return (
         <div className="h-full w-full" style={{overflow: 'hidden'}}>
             <Logo/>
@@ -28,6 +45,7 @@ export default function Home() {
                     }
                 ]}/>
             </div>
+            <FAQModal />
         </div>
     );
 }

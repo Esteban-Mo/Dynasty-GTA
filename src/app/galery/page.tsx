@@ -3,6 +3,7 @@
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import CircularLoader from '@/components/loaders/CircularLoader';
+import FAQModal from "@/components/faq/FAQModal";
 
 const DynamicGaleryMenu = dynamic(() => import('@/components/galery/GaleryMenu'), {
     ssr: false,
@@ -17,6 +18,7 @@ const DynamicInteriorCards = dynamic(() => import('@/components/galery/InteriorC
 export default function Home() {
     return (
         <div className="h-full w-full">
+            <FAQModal />
             <Suspense fallback={<CircularLoader />}>
                 <DynamicGaleryMenu />
             </Suspense>

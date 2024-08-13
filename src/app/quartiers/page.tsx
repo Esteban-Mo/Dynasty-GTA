@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import CircularLoader from '@/components/loaders/CircularLoader';
+import FAQModal from "@/components/faq/FAQModal";
 
 // Hook personnalisé pour détecter si nous sommes dans un navigateur
 const useIsBrowser = () => {
@@ -35,6 +36,7 @@ export default function Home() {
 
     return (
         <div className="h-full w-full">
+            <FAQModal />
             {isLoading ? (
                 <CircularLoader/>
             ) : (
