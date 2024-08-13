@@ -22,7 +22,9 @@ export const InteriorCards: React.FC = () => {
                 const fetchedInteriors = await getAllInteriors(typeId);
                 // Filter out interiors where displayed is false
                 const displayedInteriors = fetchedInteriors.filter(interior => interior.displayed);
-                setInteriors(displayedInteriors);
+                // Sort interiors alphabetically by title
+                const sortedInteriors = displayedInteriors.sort((a, b) => a.title.localeCompare(b.title));
+                setInteriors(sortedInteriors);
             } catch (err) {
                 console.error('Error fetching interiors:', err);
                 setError('Failed to load interiors. Please try again later.');

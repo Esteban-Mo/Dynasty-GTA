@@ -4,13 +4,11 @@ import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import CircularLoader from '@/components/loaders/CircularLoader';
 
-// Chargement dynamique de GaleryMenu
 const DynamicGaleryMenu = dynamic(() => import('@/components/galery/GaleryMenu'), {
     ssr: false,
     loading: () => <CircularLoader />
 });
 
-// Chargement dynamique de InteriorCards
 const DynamicInteriorCards = dynamic(() => import('@/components/galery/InteriorCards'), {
     ssr: false,
     loading: () => <CircularLoader />

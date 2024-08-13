@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Parallax } from 'react-parallax';
-import { Chip } from '@mui/material';
-import { AlignHorizontalLeft, Bed, Chair, DirectionsCar, Inventory, MeetingRoom } from '@mui/icons-material';
+import { Chip, Tooltip } from '@mui/material';
+import { AlignHorizontalLeft, Bed, Chair, DirectionsCar, Inventory, MeetingRoom, Home, Apartment } from '@mui/icons-material';
 import { ExtendedInterior } from '@/actions/db/interior.action';
 import { Prisma } from '@prisma/client';
 
@@ -28,7 +28,7 @@ const commonChipStyle = {
 // Chip components
 const ParkingChip: React.FC<{ spots: number }> = ({ spots }) => (
     <Chip
-        style={{ ...commonChipStyle, border: '2px solid #0891b2', cursor: 'pointer' }}
+        style={{ ...commonChipStyle, border: '2px solid #0891b2', cursor: 'pointer', borderRadius: '5px' }}
         icon={<DirectionsCar style={{color: "#0891b2"}}/>}
         label={`${spots} ${spots > 1 ? "Places de parking" : "Place de parking"}`}
     />
@@ -36,7 +36,7 @@ const ParkingChip: React.FC<{ spots: number }> = ({ spots }) => (
 
 const StorageChip: React.FC<{ storage: number }> = ({ storage }) => (
     <Chip
-        style={{ ...commonChipStyle, border: '2px solid #a2500f' }}
+        style={{ ...commonChipStyle, border: '2px solid #a2500f', borderRadius: '5px' }}
         icon={<Inventory style={{color: "#a2500f"}}/>}
         label={`${storage} Kg`}
     />
@@ -44,7 +44,7 @@ const StorageChip: React.FC<{ storage: number }> = ({ storage }) => (
 
 const FloorChip: React.FC<{ floor: number }> = ({ floor }) => (
     <Chip
-        style={{ ...commonChipStyle, border: '2px solid #a2310f' }}
+        style={{ ...commonChipStyle, border: '2px solid #a2310f', borderRadius: '5px' }}
         icon={<AlignHorizontalLeft style={{color: "#a2310f"}}/>}
         label={floor > 1 ? `${floor} Étages` : "Plein pied"}
     />
@@ -52,7 +52,7 @@ const FloorChip: React.FC<{ floor: number }> = ({ floor }) => (
 
 const RoomsChip: React.FC<{ rooms: number }> = ({ rooms }) => (
     <Chip
-        style={{ ...commonChipStyle, border: '2px solid #bb4c4c' }}
+        style={{ ...commonChipStyle, border: '2px solid #bb4c4c', borderRadius: '5px' }}
         icon={<MeetingRoom style={{color: "#bb4c4c"}}/>}
         label={`${rooms} ${rooms > 1 ? "Pièces" : "Pièce"}`}
     />
@@ -60,7 +60,7 @@ const RoomsChip: React.FC<{ rooms: number }> = ({ rooms }) => (
 
 const BedroomsChip: React.FC<{ bedrooms: number }> = ({ bedrooms }) => (
     <Chip
-        style={{ ...commonChipStyle, border: '2px solid #e7a364' }}
+        style={{ ...commonChipStyle, border: '2px solid #e7a364', borderRadius: '5px' }}
         icon={<Bed style={{color: "#e7a364"}}/>}
         label={`${bedrooms} ${bedrooms > 1 ? "Chambres" : "Chambre"}`}
     />
@@ -73,10 +73,64 @@ const FurnitureChip: React.FC<{ furniture: boolean, unfurnished: boolean }> = ({
 
     return (
         <Chip
-            style={{ ...commonChipStyle, border: '2px solid #303434' }}
+            style={{ ...commonChipStyle, border: '2px solid #303434', borderRadius: '5px' }}
             icon={<Chair style={{color: "#303434"}}/>}
             label={label}
         />
+    );
+};
+
+const PriceChip: React.FC<{ type: 'rent' | 'buy', min?: number | null, max?: number | null }> = ({ type, min, max }) => {
+    if (!min && !max) return null;
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
+    };
+
+    let label: string;
+    let icon: JSX.Element;
+    let borderColor: string;
+    let tooltipText: string;
+
+    if (type === 'rent') {
+        label = 'Location';
+        icon = <Apartment style={{color: "#4caf50"}}/>;
+        borderColor = '#4caf50';
+        tooltipText = "Prix de location hebdomadaire";
+    } else {
+        label = 'Achat';
+        icon = <Home style={{color: "#2196f3"}}/>;
+        borderColor = '#2196f3';
+        tooltipText = "Prix d'achat du bien";
+    }
+
+    const priceLabel = min && max
+        ? `Entre ${formatPrice(min)} et ${formatPrice(max)}`
+        : min
+            ? `À partir de ${formatPrice(min)}`
+            : `Jusqu'à ${formatPrice(max!)}`;
+
+    return (
+        <Tooltip title={tooltipText} arrow>
+            <Chip
+                style={{
+                    ...commonChipStyle,
+                    border: `2px solid ${borderColor}`,
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    padding: '5px',
+                    height: 'auto',
+                }}
+                icon={icon}
+                label={
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '1px' }}>
+                        <div style={{fontSize: '12px', fontWeight: 'normal'}}>{label}</div>
+                        <div>{priceLabel}</div>
+                    </div>
+                }
+            />
+        </Tooltip>
     );
 };
 
@@ -112,7 +166,7 @@ export const InteriorCard: React.FC<{ data: ExtendedInterior }> = ({ data }) => 
                         objectFit: 'cover',
                     }}
                 >
-                    <div style={{height: 800}} className="flex flex-row justify-center items-end gap-5">
+                    <div style={{height: 800}} className="flex flex-col justify-between items-center">
                         <div style={{
                             padding: 20,
                             position: "absolute",
@@ -124,6 +178,13 @@ export const InteriorCard: React.FC<{ data: ExtendedInterior }> = ({ data }) => 
                             textShadow: "0px 0px 6px #222222",
                         }}>{data.title}</div>
 
+                        {/* Price chips at the top */}
+                        <div className="flex flex-row justify-center items-center mt-6 gap-5 font-bold">
+                            <PriceChip type="rent" min={data.minRentalPrice} max={data.maxRentalPrice} />
+                            <PriceChip type="buy" min={data.minPurchasePrice} max={data.maxPurchasePrice} />
+                        </div>
+
+                        {/* Other chips at the bottom */}
                         <div className="flex flex-row justify-center items-center m-5 gap-5 font-bold">
                             {shouldRenderChip(data.parkingSpots) && (
                                 <ParkingChip spots={data.parkingSpots!} />
