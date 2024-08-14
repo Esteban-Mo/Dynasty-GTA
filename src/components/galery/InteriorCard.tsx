@@ -96,12 +96,12 @@ const PriceChip: React.FC<{ type: 'rent' | 'buy', min?: number | null, max?: num
         label = 'Location';
         icon = <Apartment style={{color: "#4caf50"}}/>;
         borderColor = '#4caf50';
-        tooltipText = "Prix de location hebdomadaire";
+        tooltipText = "Tarif de location hebdomadaire - Ce montant est indicatif et peut varier. Il représente une moyenne et non un prix fixe.";
     } else {
         label = 'Achat';
         icon = <Home style={{color: "#2196f3"}}/>;
         borderColor = '#2196f3';
-        tooltipText = "Prix d'achat du bien";
+        tooltipText = "Tarif d'achat du bien - Ce montant est indicatif et peut varier. Il représente une moyenne et non un prix fixe.";
     }
 
     const priceLabel = min && max

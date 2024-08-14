@@ -11,9 +11,19 @@ interface Zone {
     color: string;
 }
 
+interface Pin {
+    id: number;
+    lat: number;
+    lng: number;
+}
+
 const Leaflet: React.FC = () => {
     const handleZonesChange = (newZones: Zone[]) => {
         console.log(JSON.stringify(newZones));
+    };
+
+    const handlePinsChange = (newPins: Pin[]) => {
+        console.log(JSON.stringify(newPins));
     };
 
     return (
@@ -32,19 +42,22 @@ const Leaflet: React.FC = () => {
                     bounds={[[0, 0], [180, 180]]}
                     interactive={false}
                 />
-                <LeafletZone onZonesChange={handleZonesChange} />
+                <LeafletZone
+                    onZonesChange={handleZonesChange}
+                    onPinsChange={handlePinsChange}
+                />
             </MapContainer>
             <style jsx global>{`
-        .leaflet-tooltip.custom-tooltip {
-          background-color: transparent;
-          border: none;
-          box-shadow: none;
-          color: white;
-          font-weight: bold;
-          text-shadow: 0 0 3px rgba(0,0,0,0.75);
-          font-size: 14px;
-        }
-      `}</style>
+                .leaflet-tooltip.custom-tooltip {
+                    background-color: transparent;
+                    border: none;
+                    box-shadow: none;
+                    color: white;
+                    font-weight: bold;
+                    text-shadow: 0 0 3px rgba(0,0,0,0.75);
+                    font-size: 14px;
+                }
+            `}</style>
         </div>
     );
 };

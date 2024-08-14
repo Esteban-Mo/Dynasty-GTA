@@ -8,24 +8,24 @@ datasource db {
 }
 
 model Interior {
-  id                 Int          @id @default(autoincrement())
-  title              String
-  listImages         Json
-  typeId             Int
-  furniture          Boolean
-  unfurnished        Boolean
-  description        String?
-  stockage           Int?
-  rooms              Int?
-  bedRooms           Int?
-  floor              Int?
-  parkingSpots       Int?
-  displayed          Boolean      @default(true)
-  minRentalPrice     Float?
-  maxRentalPrice     Float?
-  minPurchasePrice   Float?
-  maxPurchasePrice   Float?
-  type               TypeInterior @relation(fields: [typeId], references: [id])
+  id               Int          @id @default(autoincrement())
+  title            String
+  listImages       Json
+  typeId           Int
+  furniture        Boolean
+  unfurnished      Boolean
+  description      String?
+  stockage         Int?
+  rooms            Int?
+  bedRooms         Int?
+  floor            Int?
+  parkingSpots     Int?
+  displayed        Boolean      @default(true)
+  minRentalPrice   Float?
+  maxRentalPrice   Float?
+  minPurchasePrice Float?
+  maxPurchasePrice Float?
+  type             TypeInterior @relation(fields: [typeId], references: [id])
 }
 
 model TypeInterior {
@@ -46,11 +46,19 @@ model Zone {
 }
 
 model FAQ {
-  id         Int      @id @default(autoincrement())
-  question   String
-  answer     String
-  order      Int      @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  isActive   Boolean  @default(true)
+  id        Int      @id @default(autoincrement())
+  question  String
+  answer    String
+  order     Int      @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+}
+
+model Pin {
+  id        Int      @id @default(autoincrement())
+  lat       Float
+  lng       Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
