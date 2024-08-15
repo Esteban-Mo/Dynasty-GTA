@@ -4,8 +4,9 @@ import {Interior, PrismaClient, TypeInterior} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export type ExtendedInterior = Interior & {
+export type ExtendedInterior = Omit<Interior, 'listImages'> & {
     type: TypeInterior;
+    listImages: string[];
 };
 
 async function fetchImageUrls(baseUrl: string): Promise<string[]> {
@@ -40,13 +41,19 @@ export const getAllInteriors = async (typeId?: number): Promise<ExtendedInterior
     });
 
     return await Promise.all(
-        interiors.map(async (interior) => {
-            const baseUrl = interior.listImages as string;
+        interiors.map(async (interior): Promise<ExtendedInterior> => {
+            let baseUrl: string;
+
+            baseUrl = interior.listImages;
+
             const imageUrls = await fetchImageUrls(baseUrl);
+
+            const {listImages, ...restInterior} = interior;
+
             return {
-                ...interior,
+                ...restInterior,
                 listImages: imageUrls,
-            } as ExtendedInterior;
+            };
         })
     );
 };
