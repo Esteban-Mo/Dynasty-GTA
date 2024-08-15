@@ -10,7 +10,7 @@ datasource db {
 model Interior {
   id               Int          @id @default(autoincrement())
   title            String
-  listImages       Json
+  listImages       String
   typeId           Int
   furniture        Boolean
   unfurnished      Boolean
