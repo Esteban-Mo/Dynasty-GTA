@@ -5,10 +5,11 @@ import L, { LatLng, LeafletEvent, PathOptions, LatLngBounds, divIcon } from 'lea
 import { createZone, ExtendedZone, getAllZones, ZoneInput } from '@/actions/db/zone.action';
 import { createPin, ExtendedPin, getAllPins, PinInput } from '@/actions/db/pin.action';
 import { useSearchParams } from 'next/navigation';
-import { Switch, FormControlLabel, IconButton } from '@mui/material';
+import { Switch, FormControlLabel, IconButton, Menu, MenuItem } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Diamond from '@mui/icons-material/Diamond';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { renderToString } from 'react-dom/server';
 
 interface Zone {
@@ -56,6 +57,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
     const [showNames, setShowNames] = useState<boolean>(false);
     const [showPins, setShowPins] = useState<boolean>(true);
     const [isLegendOpen, setIsLegendOpen] = useState<boolean>(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
     const [currentLayer, setCurrentLayer] = useState<L.Layer | null>(null);
     const searchParams = useSearchParams();
@@ -241,6 +243,19 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
         setIsLegendOpen(!isLegendOpen);
     };
 
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handlePinSelect = (pin: Pin) => {
+        map.setView([pin.lat, pin.lng], 15);
+        handleClose();
+    };
+
     const editControlOptions = {
         position: 'topleft',
         draw: {
@@ -394,8 +409,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                 >
                     {isLegendOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                 </IconButton>
-                <div style={{ padding: '10px', display: isLegendOpen ? 'flex' : 'none', flexDirection: 'column'
-                }}>
+                <div style={{ padding: '10px', display: isLegendOpen ? 'flex' : 'none', flexDirection: 'column' }}>
                     <h3 style={{ marginBottom: '10px', fontWeight: 'bold', color: 'white' }}>Légende</h3>
                     <FormControlLabel
                         control={
@@ -446,22 +460,34 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                         </div>
                     ))}
                     <h4 style={{ marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', color: 'white' }}>Maisons Prestigieuses</h4>
-                    {pins.map((pin, index) => (
-                        <div
-                            key={pin.id}
-                            onClick={() => map.setView([pin.lat, pin.lng], 15)}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                marginBottom: '5px',
-                                cursor: 'pointer',
-                                color: 'white'
+                    <div>
+                        <IconButton
+                            aria-controls="simple-menu"
+                            aria-haspopup="true"
+                            onClick={handleClick}
+                            style={{ color: 'white',
+                                fontSize: '14px',
                             }}
                         >
-                            <Diamond style={{ color: '#29c9ce', marginRight: '10px', fontSize: '18px' }} />
-                            <span>Maison Prestigieuse {index + 1}</span>
-                        </div>
-                    ))}
+                            <Diamond style={{ color: '#29c9ce', marginRight: '5px', fontSize: '18px' }} />
+                            Sélectionner une maison
+                            <ExpandMoreIcon />
+                        </IconButton>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            {pins.map((pin, index) => (
+                                <MenuItem key={pin.id} onClick={() => handlePinSelect(pin)}>
+                                    <Diamond style={{ color: '#29c9ce', marginRight: '10px', fontSize: '12px' }} />
+                                    Maison Prestigieuse {index + 1}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </div>
                 </div>
             </div>
             <style jsx global>{`
