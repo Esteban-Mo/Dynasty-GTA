@@ -4,5 +4,7 @@ export const text = {
         "home": "Accueil",
         "map": "Carte",
         "interior": "Intérieur",
+        "contact": "Contact",
+        "pro_space": "Espace Pro",
     }
 }
