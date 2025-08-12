@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from 'react';
-import ClientLayout from './ClientLayout';  // Nous allons créer ce composant
+import ClientLayout from './ClientLayout';
+import AuthProvider from "@/components/providers/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,13 +14,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
     return (
-        <html lang="en" className="dark h-full w-full">
+        <html lang="fr" className="dark h-full w-full">
         <body className={`${inter.className} h-full w-full`}>
-        <ClientLayout>
-            <main className="h-full w-full">
-                {children}
-            </main>
-        </ClientLayout>
+        <AuthProvider>
+            <ClientLayout>
+                <main className="h-full w-full">
+                    {children}
+                </main>
+            </ClientLayout>
+        </AuthProvider>
         </body>
         </html>
     );

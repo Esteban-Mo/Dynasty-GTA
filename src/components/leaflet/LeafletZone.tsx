@@ -4,12 +4,8 @@ import { EditControl } from "react-leaflet-draw";
 import L, { LatLng, LeafletEvent, PathOptions, LatLngBounds, divIcon } from 'leaflet';
 import { createZone, ExtendedZone, getAllZones, ZoneInput } from '@/actions/db/zone.action';
 import { createPin, ExtendedPin, getAllPins, PinInput } from '@/actions/db/pin.action';
-import { useSearchParams } from 'next/navigation';
-import { Switch, FormControlLabel, IconButton, Menu, MenuItem } from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { useSession } from 'next-auth/react';
 import Diamond from '@mui/icons-material/Diamond';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { renderToString } from 'react-dom/server';
 
 interface Zone {
@@ -53,17 +49,14 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
     const [currentPin, setCurrentPin] = useState<Pin | null>(null);
     const [zoneName, setZoneName] = useState<string>('');
     const [zoneColor, setZoneColor] = useState<string>('#3388ff');
-    const [highlightedZoneId, setHighlightedZoneId] = useState<number | null>(null);
-    const [showNames, setShowNames] = useState<boolean>(false);
+    const [showNames, setShowNames] = useState<boolean>(true);
     const [showPins, setShowPins] = useState<boolean>(true);
-    const [isLegendOpen, setIsLegendOpen] = useState<boolean>(false);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
     const [currentLayer, setCurrentLayer] = useState<L.Layer | null>(null);
-    const searchParams = useSearchParams();
     const map = useMap();
+    const { data: session, status } = useSession();
 
-    const isAdmin = searchParams.get('r') === 'nGsxvM4ABSbBg965e020rKwyWjG2n8nUJtBeTh9lxLrw0hAgx3';
+    const isAdmin = session?.user?.role === 'ADMIN';
 
     const diamondIcon = createDiamondIcon();
 
@@ -225,36 +218,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
         }
     };
 
-    const handleZoomToZone = (zone: Zone) => {
-        // @ts-ignore
-        const bounds = new LatLngBounds(zone.coordinates);
-        map.fitBounds(bounds, { padding: [50, 50] });
-    };
 
-    const handleToggleNames = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setShowNames(event.target.checked);
-    };
-
-    const handleTogglePins = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setShowPins(event.target.checked);
-    };
-
-    const toggleLegend = () => {
-        setIsLegendOpen(!isLegendOpen);
-    };
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handlePinSelect = (pin: Pin) => {
-        map.setView([pin.lat, pin.lng], 15);
-        handleClose();
-    };
 
     const editControlOptions = {
         position: 'topleft',
@@ -292,8 +256,8 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                     positions={zone.coordinates}
                     pathOptions={{
                         color: zone.color,
-                        fillOpacity: highlightedZoneId === zone.id ? 0.8 : 0.6,
-                        weight: highlightedZoneId === zone.id ? 3 : 2
+                        fillOpacity: 0.6,
+                        weight: 2
                     } as PathOptions}
                 >
                     {showNames && (
@@ -386,110 +350,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                     )}
                 </div>
             )}
-            <div style={{
-                position: 'absolute',
-                bottom: '120px',
-                left: '35px',
-                backgroundColor: '#333333',
-                borderRadius: '8px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                zIndex: 1000,
-                transition: 'transform 0.3s ease-in-out',
-                transform: isLegendOpen ? 'translateX(0)' : 'translateX(calc(-100% + 40px))',
-            }}>
-                <IconButton
-                    onClick={toggleLegend}
-                    style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        backgroundColor: '#333333',
-                        color: 'white',
-                    }}
-                >
-                    {isLegendOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                </IconButton>
-                <div style={{ padding: '10px', display: isLegendOpen ? 'flex' : 'none', flexDirection: 'column' }}>
-                    <h3 style={{ marginBottom: '10px', fontWeight: 'bold', color: 'white' }}>Légende</h3>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={showNames}
-                                onChange={handleToggleNames}
-                                name="showNames"
-                                color="primary"
-                            />
-                        }
-                        label="Afficher les noms des zones"
-                        style={{ color: 'white', marginBottom: '10px' }}
-                    />
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={showPins}
-                                onChange={handleTogglePins}
-                                name="showPins"
-                                color="primary"
-                            />
-                        }
-                        label="Afficher les maisons prestigieuses"
-                        style={{ color: 'white', marginBottom: '10px' }}
-                    />
-                    {zones.map((zone) => (
-                        <div
-                            key={zone.id}
-                            onMouseEnter={() => setHighlightedZoneId(zone.id)}
-                            onMouseLeave={() => setHighlightedZoneId(null)}
-                            onClick={() => handleZoomToZone(zone)}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                marginBottom: '5px',
-                                cursor: 'pointer',
-                                color: 'white'
-                            }}
-                        >
-                            <div style={{
-                                width: '20px',
-                                height: '20px',
-                                backgroundColor: zone.color,
-                                marginRight: '10px',
-                                border: '1px solid white'
-                            }}></div>
-                            <span>{zone.name}</span>
-                        </div>
-                    ))}
-                    <h4 style={{ marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', color: 'white' }}>Maisons Prestigieuses</h4>
-                    <div>
-                        <IconButton
-                            aria-controls="simple-menu"
-                            aria-haspopup="true"
-                            onClick={handleClick}
-                            style={{ color: 'white',
-                                fontSize: '14px',
-                            }}
-                        >
-                            <Diamond style={{ color: '#29c9ce', marginRight: '5px', fontSize: '18px' }} />
-                            Sélectionner une maison
-                            <ExpandMoreIcon />
-                        </IconButton>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            {pins.map((pin, index) => (
-                                <MenuItem key={pin.id} onClick={() => handlePinSelect(pin)}>
-                                    <Diamond style={{ color: '#29c9ce', marginRight: '10px', fontSize: '12px' }} />
-                                    Maison Prestigieuse {index + 1}
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </div>
-                </div>
-            </div>
+
             <style jsx global>{`
                 .diamond-icon {
                     display: flex;

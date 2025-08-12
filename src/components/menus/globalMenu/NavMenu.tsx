@@ -8,18 +8,21 @@ import {
     ContactMail,
     QuestionAnswer,
     Menu as MenuIcon,
-    Close
+    Close,
+    Logout as LogoutIcon
 } from '@mui/icons-material';
-import {IconButton, Tooltip, Drawer} from '@mui/material';
+import {IconButton, Tooltip, Drawer, Divider} from '@mui/material';
 import {usePathname, useRouter} from 'next/navigation';
 import {text} from '@/lib/text';
 import { useState, useEffect } from 'react';
 import FAQModal from '@/components/modals/FAQModal';
 import ContactModal from '@/components/modals/ContactModal';
+import { signOut, useSession } from 'next-auth/react';
 
 const NavMenu = () => {
     const router = useRouter();
     const pathname = usePathname();
+    const { data: session, status } = useSession();
     const color = '#f4b53f'
     const [isFAQOpen, setIsFAQOpen] = useState(false);
     const [isContactOpen, setIsContactOpen] = useState(false);
@@ -62,11 +65,15 @@ const NavMenu = () => {
         setIsMobileMenuOpen(false); // Fermer le menu mobile après navigation
     }
 
+    async function handleLogout(): Promise<void> {
+        await signOut({ callbackUrl: '/' });
+    }
+
     const menuItems = [
         { icon: House, label: text.global_menu.home, path: '/', current: pathname === '/' },
         { icon: Map, label: text.global_menu.map, path: '/quartiers', current: pathname === '/quartiers' },
         { icon: Image, label: text.global_menu.interior, path: '/galery?type=1', current: pathname === '/galery' },
-        { icon: Business, label: text.global_menu.pro_space, path: '/espace-pro', current: pathname === '/espace-pro' }
+        { icon: Business, label: text.global_menu.pro_space, path: '/pro', current: pathname === '/pro' }
     ];
 
     return (
@@ -96,6 +103,33 @@ const NavMenu = () => {
                                 </Tooltip>
                             );
                         })}
+
+                        {/* Logout icon - uniquement si connecté */}
+                        {session && status === "authenticated" && (
+                            <>
+                                <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+                                <Tooltip 
+                                    title="Déconnexion" 
+                                    placement={"left"} 
+                                    arrow
+                                    componentsProps={{
+                                        tooltip: { sx: tooltipStyles.tooltip },
+                                        arrow: { sx: tooltipStyles.arrow }
+                                    }}
+                                >
+                                    <IconButton
+                                        onClick={handleLogout}
+                                        sx={{
+                                            color: '#ef4444',
+                                            '&:hover': { color: '#f87171' }
+                                        }}
+                                        aria-label="Déconnexion"
+                                    >
+                                        <LogoutIcon fontSize={'medium'} />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        )}
                     </div>
 
                     {/* Boutons FAQ et Contact en bas */}
@@ -241,6 +275,23 @@ const NavMenu = () => {
                                     <ContactMail sx={{ color: color }} />
                                     <span className="text-amber-400 font-medium">Contact</span>
                                 </button>
+
+                                {/* Logout - uniquement si connecté */}
+                                {session && status === "authenticated" && (
+                                    <>
+                                        <div className="h-px bg-gray-600 my-2"></div>
+                                        <button
+                                            onClick={() => {
+                                                handleLogout();
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className="flex items-center space-x-4 p-4 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-400/30 w-full transition-all"
+                                        >
+                                            <LogoutIcon sx={{ color: '#ef4444' }} />
+                                            <span className="text-red-400 font-medium">Déconnexion</span>
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </Drawer>
