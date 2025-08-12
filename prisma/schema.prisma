@@ -98,6 +98,12 @@ model TypeInterior {
   interiors Interior[]
 }
 
+enum PinType {
+  DEFAULT
+  PRESTIGE
+  UNAVAILABLE
+}
+
 model Zone {
   id          Int      @id @default(autoincrement())
   name        String
@@ -121,6 +127,7 @@ model Pin {
   id        Int      @id @default(autoincrement())
   lat       Float
   lng       Float
+  type      PinType  @default(DEFAULT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
