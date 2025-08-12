@@ -173,7 +173,7 @@ const NavMenu = () => {
             {isMobile && (
                 <>
                     {/* Bouton Burger */}
-                    <div className="fixed top-5 right-5 z-50">
+                    <div className="fixed top-5 right-5 z-[2000]" style={{ zIndex: 2000 }}>
                         <IconButton
                             onClick={() => setIsMobileMenuOpen(true)}
                             sx={{

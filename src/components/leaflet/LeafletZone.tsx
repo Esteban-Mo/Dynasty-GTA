@@ -371,9 +371,9 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                 );
             })}
             {isAdmin && (
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-[1000]">
+                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[3000] w-[95vw] max-w-3xl">
                     {(currentZone || currentPin) && (
-                        <div className="flex items-center gap-3 bg-black/70 backdrop-blur-md border border-amber-400/40 rounded-xl px-4 py-3">
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 bg-black/70 backdrop-blur-md border border-amber-400/40 rounded-xl px-4 py-3">
                             {currentZone && (
                                 <>
                                     <input
@@ -381,24 +381,24 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                                         value={zoneName}
                                         onChange={handleZoneNameChange}
                                         placeholder="Nom de la zone"
-                                        className="px-3 py-2 rounded-md bg-black/50 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                        className="px-3 py-2 rounded-md bg-black/50 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-400 w-full sm:w-auto"
                                     />
                                     <input
                                         type="color"
                                         value={zoneColor}
                                         onChange={handleZoneColorChange}
-                                        className="w-10 h-10 rounded-md cursor-pointer border border-gray-600 bg-transparent"
+                                        className="w-10 h-10 rounded-md cursor-pointer border border-gray-600 bg-transparent flex-shrink-0"
                                     />
                                     <button
                                         onClick={saveZone}
                                         disabled={!currentZone || !zoneName}
-                                        className={`px-4 py-2 rounded-md text-white ${(!currentZone || !zoneName) ? 'bg-gray-600 cursor-not-allowed' : 'bg-amber-600 hover:bg-amber-500'}`}
+                                        className={`px-4 py-2 rounded-md text-white w-full sm:w-auto ${(!currentZone || !zoneName) ? 'bg-gray-600 cursor-not-allowed' : 'bg-amber-600 hover:bg-amber-500'}`}
                                     >
                                         Sauvegarder
                                     </button>
                                     <button
                                         onClick={handleDeleteZone}
-                                        className="px-3 py-2 rounded-md text-white bg-red-600 hover:bg-red-500"
+                                        className="px-3 py-2 rounded-md text-white bg-red-600 hover:bg-red-500 w-full sm:w-auto"
                                     >
                                         Supprimer
                                     </button>
@@ -408,7 +408,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                                 <>
                                     <button
                                         onClick={handleDeletePin}
-                                        className="px-3 py-2 rounded-md text-white bg-red-600 hover:bg-red-500"
+                                        className="px-3 py-2 rounded-md text-white bg-red-600 hover:bg-red-500 w-full sm:w-auto"
                                     >
                                         Supprimer le pin
                                     </button>
@@ -420,7 +420,7 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                                                 setPinType(currentPin.id, next);
                                                 await updatePinType(currentPin.id, next as any);
                                             }}
-                                            className={`px-3 py-1 rounded-md border ${ (pinTypeById[currentPin.id] ?? 'DEFAULT') === 'PRESTIGE' ? 'border-amber-400 text-amber-300' : 'border-gray-600 text-white/80'}`}
+                                            className={`px-3 py-1 rounded-md border w-full sm:w-auto ${ (pinTypeById[currentPin.id] ?? 'DEFAULT') === 'PRESTIGE' ? 'border-amber-400 text-amber-300' : 'border-gray-600 text-white/80'}`}
                                         >Diamant</button>
                                         <button
                                             onClick={async () => {
@@ -428,14 +428,14 @@ const LeafletZone: React.FC<LeafletZoneProps> = ({ onZonesChange, onPinsChange }
                                                 setPinType(currentPin.id, next);
                                                 await updatePinType(currentPin.id, next as any);
                                             }}
-                                            className={`px-3 py-1 rounded-md border ${ (pinTypeById[currentPin.id] ?? 'DEFAULT') === 'UNAVAILABLE' ? 'border-red-400 text-red-300' : 'border-gray-600 text-white/80'}`}
+                                            className={`px-3 py-1 rounded-md border w-full sm:w-auto ${ (pinTypeById[currentPin.id] ?? 'DEFAULT') === 'UNAVAILABLE' ? 'border-red-400 text-red-300' : 'border-gray-600 text-white/80'}`}
                                         >Croix rouge</button>
                                     </div>
                                 </>
                             )}
                             <button
                                 onClick={() => { setCurrentZone(null); setCurrentPin(null); }}
-                                className="px-3 py-2 rounded-md text-white bg-gray-700 hover:bg-gray-600"
+                                className="px-3 py-2 rounded-md text-white bg-gray-700 hover:bg-gray-600 w-full sm:w-auto"
                             >
                                 Fermer
                             </button>

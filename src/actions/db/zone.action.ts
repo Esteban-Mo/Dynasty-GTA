@@ -1,6 +1,8 @@
 "use server";
 
 import { PrismaClient, Zone, Prisma } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -18,6 +20,8 @@ export const getAllZones = async (): Promise<ExtendedZone[]> => {
 };
 
 export const createZone = async (zoneData: ZoneInput): Promise<ExtendedZone> => {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') throw new Error('UNAUTHORIZED');
     const newZone = await prisma.zone.create({
         data: {
             name: zoneData.name,
@@ -29,6 +33,8 @@ export const createZone = async (zoneData: ZoneInput): Promise<ExtendedZone> => 
 };
 
 export const deleteZone = async (id: number): Promise<void> => {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') throw new Error('UNAUTHORIZED');
     await prisma.zone.delete({ where: { id } });
 };
 
@@ -36,6 +42,8 @@ export const updateZone = async (
     id: number,
     data: { name?: string; color?: string; coordinates?: Prisma.InputJsonValue }
 ): Promise<ExtendedZone> => {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') throw new Error('UNAUTHORIZED');
     const updated = await prisma.zone.update({
         where: { id },
         data,

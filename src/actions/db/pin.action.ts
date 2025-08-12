@@ -1,6 +1,8 @@
 "use server"
 
 import { PrismaClient } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -33,6 +35,8 @@ export async function getAllPins(): Promise<ExtendedPin[]> {
 
 export async function createPin(pinData: PinInput): Promise<ExtendedPin> {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || session.user.role !== 'ADMIN') throw new Error('UNAUTHORIZED');
         const newPin = await prisma.pin.create({
             data: pinData as any,
         });
@@ -45,6 +49,8 @@ export async function createPin(pinData: PinInput): Promise<ExtendedPin> {
 
 export async function deletePin(id: number): Promise<void> {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || session.user.role !== 'ADMIN') throw new Error('UNAUTHORIZED');
         await prisma.pin.delete({ where: { id } });
     } catch (error) {
         console.error("Error deleting pin:", error);
@@ -54,6 +60,8 @@ export async function deletePin(id: number): Promise<void> {
 
 export async function updatePinType(id: number, type: PinTypeDB): Promise<ExtendedPin> {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || session.user.role !== 'ADMIN') throw new Error('UNAUTHORIZED');
         const p = await prisma.pin.update({ where: { id }, data: { type } });
         return p as unknown as ExtendedPin;
     } catch (error) {

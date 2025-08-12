@@ -64,23 +64,25 @@ export default async function ProDashboard() {
             </div>
           </Link>
 
-          {/* Profil & Sécurité */}
-          <Link href="/pro/profile" className="group">
-            <div className="bg-black/60 backdrop-blur-sm rounded-xl p-6 border border-gray-600 hover:border-amber-400 transition-all duration-300 group-hover:transform group-hover:scale-105">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <Person className="text-blue-400 text-xl" />
+          {/* Profil & Sécurité (Admin uniquement) */}
+          {session.user.role === 'ADMIN' && (
+            <Link href="/pro/profile" className="group">
+              <div className="bg-black/60 backdrop-blur-sm rounded-xl p-6 border border-gray-600 hover:border-amber-400 transition-all duration-300 group-hover:transform group-hover:scale-105">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <Person className="text-blue-400 text-xl" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">Profil</h3>
+                    <p className="text-gray-400 text-sm">Paramètres du compte</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">Profil</h3>
-                  <p className="text-gray-400 text-sm">Paramètres du compte</p>
-                </div>
+                <p className="text-gray-300 text-sm">
+                  Gérez votre profil et vos paramètres de sécurité
+                </p>
               </div>
-              <p className="text-gray-300 text-sm">
-                Gérez votre profil et vos paramètres de sécurité
-              </p>
-            </div>
-          </Link>
+            </Link>
+          )}
 
           {/* Administration (Admin uniquement) */}
           {session.user.role === 'ADMIN' && (
